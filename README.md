@@ -20,7 +20,7 @@
 
 <!-- ABOUT -->
 ## About
-For more infomation about the project please read in [Nettruyen Downloader](https://github.com/quantrancse/nettruyen-downloaderm).
+For more infomation about the project please read in [Nettruyen Downloader](https://github.com/quantrancse/nettruyen-downloader).
 
 <!-- GETTING STARTED -->
 ## Getting Started
