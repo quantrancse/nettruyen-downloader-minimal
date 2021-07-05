@@ -1,6 +1,0 @@
-{
-    "app_name": "nettruyen_downloader_minimal",
-    "author": "quantrancse",
-    "main_module": "src/main/python/nettruyen_minimal.py",
-    "version": "1.0.0"
-}

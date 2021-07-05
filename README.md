@@ -20,9 +20,9 @@
 
 <!-- ABOUT -->
 ## About
-[Update_1] This tool is not working anymore. The raw requests to the image host have been blocked by the Cloudflare firewall. And I'm too lazy.
+[Update: 07-05-2021] This tool is working.
 
-[Update_2] I've found a Tampermonkey script that works on different manga sites: https://github.com/lelinhtinh/Userscript/tree/master/manga_comic_downloader
+[Other] I've found a Tampermonkey script that works on different manga sites: https://github.com/lelinhtinh/Userscript/tree/master/manga_comic_downloader
 
 Thanks to the author and use it by your own way.
 
@@ -45,14 +45,11 @@ I just only test it on Windows platform but the source code can be built to run 
 ```sh
 pip install pyqt5
 ```
-* pyrcc5
-* fbs or pyinstaller
+* pyinstaller
 ```sh
-pip install fbs
+pip install bs4 requests pyqt5 pyinstaller
 ```
-* Some IDE if needed: Qt Creator, Qt Designer
-
-**_Notes:_** _fbs does not run with python > 3.6, so if you want to build with higher python version please use pyinstaller_
+* Some IDE if needed: Qt Designer
 
 ### Installation
 
@@ -61,17 +58,10 @@ pip install fbs
 git clone https://github.com/quantrancse/nettruyen-downloader-minimal.git
 ```
 * Modify the source code
-* Run the code
-```sh
-fbs run
-```
 * Build .exe file
 ```sh
-fbs freeze
+pyinstaller ./nettruyen_minimal.spec
 ```
-
-* More info about fbs: [fbs-tutorial](https://github.com/mherrmann/fbs-tutorial)
-
 
 ## Recommended Manga Viewer
 
@@ -104,7 +94,6 @@ Distributed under the MIT License. See [LICENSE][license-url] for more informati
 ## Acknowledgements
 * [PyQt5 tutorial](https://build-system.fman.io/pyqt5-tutorial)
 * [Qt Documentation](https://doc.qt.io/)
-* [fbs tutorial](https://github.com/mherrmann/fbs-tutorial)
 
 <!-- MARKDOWN LINKS & IMAGES -->
 [python-shield]: https://img.shields.io/badge/python-3.6.8-brightgreen?style=flat-square
