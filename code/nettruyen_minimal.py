@@ -188,7 +188,7 @@ class DownloadEngine(QThread):
 
                 chapter_dir_path = self.current_manga.save_path + \
                     '/' + chapter_data['chapter_name']
-                mkdir(chapter_dir_path.replace('\"', '').replace('\'', ''))
+                mkdir(chapter_dir_path.replace('\"', '').replace('\'', '').replace('?', '').replace('!', ''))
                 chapter_data['chapter_dir_path'] = chapter_dir_path
                 self.getChapterContents(chapter_data)
                 index += 1
@@ -369,7 +369,7 @@ class Bridge(QObject):
                     manga_save_path = get_path + '/' + \
                         self.current_manga.manga_name
                     manga_save_path = manga_save_path.replace(
-                        '\"', '').replace('\'', '')
+                        '\"', '').replace('\'', '').replace('?', '').replace('!', '')
                     if not isdir(manga_save_path):
                         mkdir(manga_save_path)
 
