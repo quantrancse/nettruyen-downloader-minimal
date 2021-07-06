@@ -3,6 +3,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from os import mkdir, path
 from os.path import isdir
+from urllib.parse import urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -18,7 +19,6 @@ HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.114 Safari/537.36',
     'DNT': '1',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-    'Referer': 'http://www.nettruyenvip.com/',
     'Accept-Encoding': 'gzip, deflate',
     'Accept-Language': 'en-US,en;q=0.9'
 }
@@ -108,19 +108,19 @@ class WaitingDialog(QDialog):
         self.cancelButton.setEnabled(False)
 
     @pyqtSlot(int)
-    def updateProgressBar(self, num):
+    def update_progress_bar(self, num):
         self.progressBar.setValue(num)
 
     @pyqtSlot(str)
-    def updateChapterName(self, chapter_name):
+    def update_chapter_name(self, chapter_name):
         self.label.setText(chapter_name)
 
     @pyqtSlot(int)
-    def setMaxProgessBarValue(self, max_value):
+    def set_max_progess_bar_value(self, max_value):
         self.progressBar.setMaximum(max_value)
 
     @pyqtSlot()
-    def closeWhenDone(self):
+    def close_when_done(self):
         self.cancelButton.setText('Close')
         self.label.setText('Download Finished!')
         self.cancelButton.clicked.connect(self.Dialog.close)
@@ -139,25 +139,25 @@ class DownloadEngine(QThread):
     def __init__(self, parent=None):
         super(DownloadEngine, self).__init__(parent)
 
-    def setManga(self, manga):
+    def set_manga(self, manga):
         self.current_manga = manga
         self.image_formats = ['.jpg', '.jpeg', '.png', '.gif', '.tiff', '.bmp']
         self.stop_signal = 0
         self.error403_signal = 0
         self.error403_chapters = []
 
-    def resetError403(self):
+    def reset_error_403(self):
         self.error403_signal = 0
         self.error403_chapters = []
 
     @pyqtSlot()
-    def stopDownload(self):
+    def stop_download(self):
         self.stop_signal = 1
 
     def run(self):
-        self.crawlChapterDataList()
+        self.crawl_chapter_data_list()
 
-    def crawlChapterDataList(self):
+    def crawl_chapter_data_list(self):
         chapter_list = []
 
         # Get each chapter info
@@ -188,9 +188,10 @@ class DownloadEngine(QThread):
 
                 chapter_dir_path = self.current_manga.save_path + \
                     '/' + chapter_data['chapter_name']
-                mkdir(chapter_dir_path.replace('\"', '').replace('\'', '').replace('?', '').replace('!', ''))
+                mkdir(chapter_dir_path.replace('\"', '').replace(
+                    '\'', '').replace('?', '').replace('!', ''))
                 chapter_data['chapter_dir_path'] = chapter_dir_path
-                self.getChapterContents(chapter_data)
+                self.get_chapter_contents(chapter_data)
                 index += 1
                 self.valueProgress.emit(index)   # Update progress bar
 
@@ -198,7 +199,7 @@ class DownloadEngine(QThread):
         if self.error403_signal:
             chapters_403 = ', '.join(self.error403_chapters)
             MessageBox('Can not download some images: ' + chapters_403)
-            self.resetError403()
+            self.reset_error_403()
 
         # Update download Finish Dialog
         self.isDone.emit()
@@ -208,7 +209,7 @@ class DownloadEngine(QThread):
             self.valueProgress.emit(100)
         print('Download Done')
 
-    def getImageUrls(self, soup):
+    def get_image_urls(self, soup):
         contents = []
 
         for content_url in soup.find('div', class_='reading-detail box_doc').find_all('img'):
@@ -227,7 +228,7 @@ class DownloadEngine(QThread):
     def format_img_url(self, url):
         return url.replace('//', 'http://')
 
-    def getImagePaths(self, chapter_dir_path, contents):
+    def get_image_paths(self, chapter_dir_path, contents):
         img_path_list = []
         image_index = 1
 
@@ -243,7 +244,7 @@ class DownloadEngine(QThread):
 
         return img_path_list
 
-    def getChapterContents(self, chapter_data):
+    def get_chapter_contents(self, chapter_data):
         try:
             # Request chapter url
             request = requests.get(
@@ -251,10 +252,10 @@ class DownloadEngine(QThread):
             soup = BeautifulSoup(request.text, 'html.parser')
 
             # Get image url
-            contents = self.getImageUrls(soup)
+            contents = self.get_image_urls(soup)
 
             # Get image name
-            img_path_list = self.getImagePaths(
+            img_path_list = self.get_image_paths(
                 chapter_data['chapter_dir_path'], contents)
 
             image_data_list = list(
@@ -268,18 +269,18 @@ class DownloadEngine(QThread):
 
             # Threading for download each image
             with ThreadPoolExecutor(max_workers=20) as executor:
-                executor.map(self.downloadImage, image_data_list)
+                executor.map(self.download_image, image_data_list)
 
             # Save error chapter
             if self.error403_signal:
                 self.error403_chapters.append(chapter_data['chapter_name'])
-        except:
+        except Exception:
             MessageBox('Error get chapter info. Please try again later.')
             print('Error Get Chapter Info: ' + chapter_data['chapter_url'])
 
         print('Finish ' + chapter_data['chapter_name'])
 
-    def downloadImage(self, image_data_list):
+    def download_image(self, image_data_list):
         if not self.stop_signal:
             img_path_name, img_url = image_data_list
 
@@ -296,7 +297,7 @@ class DownloadEngine(QThread):
                         with open(img_path_name, 'wb') as handler:
                             handler.write(img_data.content)
                     break
-                except:
+                except Exception:
                     if time.time() - start > timeout:
                         MessageBox('Error download image: ' + img_path_name)
                         break
@@ -329,21 +330,21 @@ class Ui(QMainWindow):
         self.toChapterEdit = self.findChild(QLineEdit, 'toChapterEdit')
 
         self.downloadButton = self.findChild(QPushButton, 'downloadButton')
-        self.downloadButton.clicked.connect(self.downloadButtonPress)
+        self.downloadButton.clicked.connect(self.download_button_press)
 
         self.downloadAllButton = self.findChild(
             QPushButton, 'downloadAllButton')
-        self.downloadAllButton.clicked.connect(self.downloadAllButtonPress)
+        self.downloadAllButton.clicked.connect(self.download_all_button_press)
 
-        self.start_download.connect(self.bridge.startDownload)
+        self.start_download.connect(self.bridge.start_download)
 
         self.show()
 
-    def downloadButtonPress(self):
+    def download_button_press(self):
         self.start_download.emit(self.mangaUrlEdit.text(
         ), self.fromChapterEdit.text(), self.toChapterEdit.text())
 
-    def downloadAllButtonPress(self):
+    def download_all_button_press(self):
         self.start_download.emit(
             self.mangaUrlEdit.text(), 'start_chapter', 'end_chapter')
 
@@ -353,14 +354,14 @@ class Bridge(QObject):
     current_manga = MangaInfo()
 
     @pyqtSlot(str, str, str)
-    def startDownload(self, manga_url, from_chapter_input, to_chapter_input):
+    def start_download(self, manga_url, from_chapter_input, to_chapter_input):
         self.manga_url = manga_url
         self.from_chapter_input = from_chapter_input
         self.to_chapter_input = to_chapter_input
-        self.downloadChapter()
+        self.download_chapter()
 
-    def downloadChapter(self):
-        if self.checkValidUrl() and self.getChapterInput():
+    def download_chapter(self):
+        if self.check_valid_url() and self.get_chapter_input():
             get_path = str(QFileDialog.getExistingDirectory(
                 None, "Select Save Directory"))
 
@@ -376,16 +377,16 @@ class Bridge(QObject):
                     self.current_manga.save_path = manga_save_path
 
                     engine = DownloadEngine(self)
-                    engine.setManga(self.current_manga)
+                    engine.set_manga(self.current_manga)
                     dialog = WaitingDialog()
                     dialog.initUI()
 
-                    engine.valueProgress.connect(dialog.updateProgressBar)
+                    engine.valueProgress.connect(dialog.update_progress_bar)
                     engine.maxProgressValue.connect(
-                        dialog.setMaxProgessBarValue)
-                    engine.chapterName.connect(dialog.updateChapterName)
-                    engine.isDone.connect(dialog.closeWhenDone)
-                    dialog.stop_signal.connect(engine.stopDownload)
+                        dialog.set_max_progess_bar_value)
+                    engine.chapterName.connect(dialog.update_chapter_name)
+                    engine.isDone.connect(dialog.close_when_done)
+                    dialog.stop_signal.connect(engine.stop_download)
 
                     engine.start()
                     dialog.run()
@@ -394,28 +395,33 @@ class Bridge(QObject):
         else:
             return
 
-    def checkValidUrl(self):
+    def check_valid_url(self):
         current_manga_url = self.manga_url
+        result = False
 
-        if not any(substr in current_manga_url for substr in ['nhattruyenhay.com/truyen-tranh/', 'nettruyenvip.com/truyen-tranh/']):
-            MessageBox("Invalid manga url. Please try again.")
-            return False
+        domain = urlparse(current_manga_url)
+        referer_header = '{uri.scheme}://{uri.netloc}/'.format(uri=domain)
+        HEADERS['Referer'] = referer_header
+
+        if not any(substr in current_manga_url for substr in ['nhattruyen', 'nettruyen']):
+            print('Invalid manga url. Please try again.')
+            return result
         else:
             try:
                 request = requests.get(
                     current_manga_url, headers=HEADERS, timeout=5)
                 soup = BeautifulSoup(request.text, 'html.parser')
                 if not soup.find('div', id='nt_listchapter'):
-                    MessageBox("Invalid manga url. Please try again.")
-                    return False
+                    print('Invalid manga url. Please try again.')
                 else:
                     self.current_manga.manga_url = str(current_manga_url)
-                    self.crawlMangaHomePage()
-                    return True
-            except requests.ConnectionError:
+                    self.crawl_manga_home_page()
+                    result = True
+                return result
+            except Exception:
                 MessageBox("Cannot get manga url.")
 
-    def crawlMangaHomePage(self):
+    def crawl_manga_home_page(self):
         try:
             print('Start crawling ---------', self.current_manga.manga_url)
             request = requests.get(
@@ -433,29 +439,30 @@ class Bridge(QObject):
                 chapter_url_list.append(chapter['href'])
             self.current_manga.chapter_url_list = chapter_url_list
 
-        except:
+        except Exception:
             MessageBox('Error getting manga page. Please try again.')
             print('exception crawling manga !')
 
-    def getChapterIndex(self, chapter_input):
+    def get_chapter_index(self, chapter_input):
+        index = None
         if chapter_input == 'start_chapter':
-            return 0
+            index = 0
         elif chapter_input == 'end_chapter':
-            return len(self.current_manga.chapter_name_list) - 1
+            index = len(self.current_manga.chapter_name_list) - 1
         else:
             for chapter in self.current_manga.chapter_name_list:
                 chapter_name = chapter.split()[1]
                 if ':' in chapter_name:
                     chapter_name = chapter_name[:-1]
                 if chapter_input == chapter_name:
-                    return self.current_manga.chapter_name_list.index(
+                    index = self.current_manga.chapter_name_list.index(
                         chapter)
-            return None
+        return index
 
-    def getChapterInput(self):
-        from_chapter_index = self.getChapterIndex(
+    def get_chapter_input(self):
+        from_chapter_index = self.get_chapter_index(
             self.from_chapter_input)
-        to_chapter_index = self.getChapterIndex(self.to_chapter_input)
+        to_chapter_index = self.get_chapter_index(self.to_chapter_input)
 
         if from_chapter_index is not None and to_chapter_index is not None:
             if from_chapter_index > to_chapter_index:
