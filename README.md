@@ -30,13 +30,17 @@ Thanks to the author and use it by your own way.
 
 For more infomation about the project please read in [Nettruyen Downloader](https://github.com/quantrancse/nettruyen-downloader).
 
-<!-- GETTING STARTED -->
-## Getting Started
+<!-- Download -->
+## Download
 
-For the ones who want to develop this project in the future or make it for other manga website.
-<br />
-<br />
-I just only test it on Windows platform but the source code can be built to run on Mac or Linux with some modifications about the os path.
+**Windows**: [nettruyen_minimal.exe ~ 35MB](https://rebrand.ly/nettruyen_minimal)
+
+##### Recommend Manga Viewer
+
+* I have found a good image viewer application that perfectly suited for reading manga - [QuickViewer](https://kanryu.github.io/quickviewer/)
+              
+<!-- Build Project -->
+## Build Project
 
 ### Prerequisites
 
@@ -62,10 +66,6 @@ git clone https://github.com/quantrancse/nettruyen-downloader-minimal.git
 ```sh
 pyinstaller ./nettruyen_minimal.spec
 ```
-
-## Recommended Manga Viewer
-
-* I have found a good image viewer application that perfectly suited for reading manga - [QuickViewer](https://kanryu.github.io/quickviewer/)
   
 <!-- CONTRIBUTING -->
 ## Contributing
@@ -96,7 +96,7 @@ Distributed under the MIT License. See [LICENSE][license-url] for more informati
 * [Qt Documentation](https://doc.qt.io/)
 
 <!-- MARKDOWN LINKS & IMAGES -->
-[python-shield]: https://img.shields.io/badge/python-3.6.8-brightgreen?style=flat-square
+[python-shield]: https://img.shields.io/badge/python-3.9.6-brightgreen?style=flat-square
 [pyqt5-shield]: https://img.shields.io/badge/PyQt5-5.14.1-blue?style=flat-square
 [license-shield]: https://img.shields.io/github/license/quantrancse/nettruyen-downloader?style=flat-square
 [license-url]: https://github.com/quantrancse/nettruyen-downloader-minimal/blob/master/LICENSE
