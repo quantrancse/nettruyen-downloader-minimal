@@ -44,7 +44,7 @@ For more infomation about the project please read in [Nettruyen Downloader](http
 
 ### Prerequisites
 
-* python 3.6.8
+* python 3.9.7
 * PyQt5
 ```sh
 pip install pyqt5

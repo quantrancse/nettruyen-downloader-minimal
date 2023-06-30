@@ -163,7 +163,7 @@
        </font>
       </property>
       <property name="text">
-       <string>Created by: quantrancse | v1.2.0</string>
+       <string>Created by: quantrancse | v1.2.2</string>
       </property>
       <property name="alignment">
        <set>Qt::AlignCenter</set>
